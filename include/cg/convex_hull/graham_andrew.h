@@ -3,7 +3,7 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
-#include "cg/operations/orientation.h"
+#include <cg/operations/orientation.h>
 
 namespace cg
 {
@@ -52,7 +52,7 @@ namespace cg
 
         RunIter first_last = find_convex_hull_point(begin, bound, *bound);
         RunIter second_last = find_convex_hull_point(bound, end, *begin);
-        std::swap_ranges(bound, second_last, first_last);
-        return first_last + (second_last - bound);
+        return std::swap_ranges(bound, second_last, first_last);
+        //return first_last + (second_last - bound);
     }
 }
