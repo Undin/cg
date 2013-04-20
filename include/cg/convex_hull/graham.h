@@ -9,6 +9,8 @@ namespace cg
    template <class BidIter>
    BidIter contour_graham_hull(BidIter p, BidIter q)
    {
+      BidIter begin = p;
+
       if (p == q)
          return p;
 
@@ -40,8 +42,8 @@ namespace cg
          }
       }
 
-      if (orientation(*pt, *t, *b) == CG_COLLINEAR)
-         --t;
+      while (pt != begin && orientation(*pt, *t, *b) != CG_LEFT)
+         t = pt--;
 
       return ++t;
    }
