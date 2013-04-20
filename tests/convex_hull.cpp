@@ -20,7 +20,12 @@ bool is_convex_hull(FwdIter p, FwdIter c, FwdIter q)
          switch (orientation(*t, *s, *b))
          {
          case cg::CG_RIGHT: return false;
-         case cg::CG_COLLINEAR: return collinear_are_ordered_along_line(*t, *b, *s);
+         case cg::CG_COLLINEAR:
+             if (!collinear_are_ordered_along_line(*t, *b, *s))
+             {
+                 return false;
+             }
+             continue;
          case cg::CG_LEFT: continue;
          }
       }
@@ -43,6 +48,53 @@ TEST(convex_hull, simple)
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
 }
 
+TEST(convex_hull, simple2)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                    (point_2(5, 0))
+                                                    (point_2(5, 5))
+                                                    (point_2(4, 3));
+
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(convex_hull, line)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                     (point_2(1, 1))
+                                                     (point_2(3, 3))
+                                                     (point_2(-1, -1))
+                                                     (point_2(4, 4));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(convex_hull, one_point)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 1));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(convex_hull, same_points)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
+}
+
 TEST(convex_hull, uniform)
 {
    using cg::point_2;
@@ -50,6 +102,8 @@ TEST(convex_hull, uniform)
    std::vector<point_2> pts = uniform_points(10000000);
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_hull(pts.begin(), pts.end()), pts.end()));
 }
+
+
 
 TEST(andrew_convex_hull, simple)
 {
@@ -65,6 +119,53 @@ TEST(andrew_convex_hull, simple)
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_andrew_hull(pts.begin(), pts.end()), pts.end()));
 }
 
+TEST(andrew_convex_hull, simple2)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                    (point_2(5, 0))
+                                                    (point_2(5, 5))
+                                                    (point_2(4, 3));
+
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_andrew_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrew_convex_hull, line)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                     (point_2(1, 1))
+                                                     (point_2(3, 3))
+                                                     (point_2(-1, -1))
+                                                     (point_2(4, 4));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_andrew_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrew_convex_hull, one_point)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 1));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_andrew_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(andrew_convex_hull, same_points)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_andrew_hull(pts.begin(), pts.end()), pts.end()));
+}
+
 TEST(andrew_convex_hull, uniform)
 {
    using cg::point_2;
@@ -72,6 +173,8 @@ TEST(andrew_convex_hull, uniform)
    std::vector<point_2> pts = uniform_points(10000000);
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::graham_andrew_hull(pts.begin(), pts.end()), pts.end()));
 }
+
+
 
 TEST(quick_hull, simple)
 {
@@ -87,6 +190,53 @@ TEST(quick_hull, simple)
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
 }
 
+TEST(quick_hull, simple2)
+{
+   using cg::point_2;
+
+   std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                    (point_2(5, 0))
+                                                    (point_2(5, 5))
+                                                    (point_2(4, 3));
+
+   EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(quick_hull, line)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(0, 0))
+                                                     (point_2(1, 1))
+                                                     (point_2(3, 3))
+                                                     (point_2(-1, -1))
+                                                     (point_2(4, 4));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(quick_hull, one_point)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 1));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
+TEST(quick_hull, same_points)
+{
+    using cg::point_2;
+
+    std::vector<point_2> pts = boost::assign::list_of(point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1))
+                                                     (point_2(1, 1));
+
+    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
+}
+
 TEST(quick_hull, uniform)
 {
    using cg::point_2;
@@ -94,4 +244,3 @@ TEST(quick_hull, uniform)
    std::vector<point_2> pts = uniform_points(10000000);
    EXPECT_TRUE(is_convex_hull(pts.begin(), cg::quick_hull(pts.begin(), pts.end()), pts.end()));
 }
-
