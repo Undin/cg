@@ -49,12 +49,12 @@ OutIter simplify(BidIter p, BidIter q, double eps, OutIter out)
     return out;
 }
 
-double dist(point_2 a, point_2 b)
+double dist(const point_2 &a, const point_2 &b)
 {
     return std::sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-double dist(point_2 a, point_2 b, point_2 c)
+double dist(const point_2 &a, const point_2 &b, const point_2 &c)
 {
     double pr = ((c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y)) / dist(a, b);
     if (pr < 0)
@@ -65,6 +65,6 @@ double dist(point_2 a, point_2 b, point_2 c)
     {
         return dist(b, c);
     }
-    return std::abs((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)) / dist(a, b);
+    return std::abs(vector_product<double>(a, b, c)) / dist(a, b);
 }
 }
