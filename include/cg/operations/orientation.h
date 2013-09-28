@@ -24,6 +24,12 @@ namespace cg
       return a == -b;
    }
 
+   template <class Scalar>
+   Scalar vector_product(const point_2 &a, const point_2 &b, const point_2 &c)
+   {
+       return (Scalar(b.x) - a.x) * (Scalar(c.y) - a.y) - (Scalar(b.y) - a.y) * (Scalar(c.x) - a.x);
+   }
+
    struct orientation_d
    {
       boost::optional<orientation_t> operator() (point_2 const & a, point_2 const & b, point_2 const & c) const
@@ -50,8 +56,7 @@ namespace cg
          typedef boost::numeric::interval_lib::unprotect<boost::numeric::interval<double> >::type interval;
 
          boost::numeric::interval<double>::traits_type::rounding _;
-         interval res =   (interval(b.x) - a.x) * (interval(c.y) - a.y)
-                        - (interval(b.y) - a.y) * (interval(c.x) - a.x);
+         interval res = vector_product<interval>(a, b, c);
 
          if (res.lower() > 0)
             return CG_LEFT;
@@ -70,8 +75,7 @@ namespace cg
    {
       boost::optional<orientation_t> operator() (point_2 const & a, point_2 const & b, point_2 const & c) const
       {
-         mpq_class res =   (mpq_class(b.x) - a.x) * (mpq_class(c.y) - a.y)
-                         - (mpq_class(b.y) - a.y) * (mpq_class(c.x) - a.x);
+          mpq_class res = vector_product<mpq_class>(a, b, c);
 
          int cres = cmp(res, 0);
 
