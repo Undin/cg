@@ -2,6 +2,7 @@
 
 #include "cg/primitives/point.h"
 #include "cg/primitives/contour.h"
+#include "cg/primitives/segment.h"
 #include <boost/numeric/interval.hpp>
 #include <gmpxx.h>
 
@@ -28,6 +29,12 @@ namespace cg
    Scalar vector_product(const point_2 &a, const point_2 &b, const point_2 &c)
    {
        return (Scalar(b.x) - a.x) * (Scalar(c.y) - a.y) - (Scalar(b.y) - a.y) * (Scalar(c.x) - a.x);
+   }
+
+   template <class Scalar>
+   Scalar vector_product(const segment_2 &seg, const point_2 &point)
+   {
+       return vector_product<Scalar>(seg[0], seg[1], point);
    }
 
    struct orientation_d
