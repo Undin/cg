@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "stdafx.h"
 
 #include "cg/visualization/draw_util.h"
@@ -30,5 +32,20 @@ namespace visualization
          drawer.draw_line(segment_2f(pt, *it));
       }
       while (it != beg);
+   }
+
+   void draw(drawer_type &drawer, const circle_2f &circle)
+   {
+       int iter_number = 100;
+       float PI = asin(1) * 2;
+       float delta = 2 * PI / iter_number;
+
+       for (int i = 0; i < 100; i++) {
+           float alpha1 = delta * i;
+           float alpha2 = delta * (i + 1);
+           vector_2f first(circle.r * cos(alpha1), circle.r * sin(alpha1));
+           vector_2f second(circle.r * cos(alpha2), circle.r * sin(alpha2));
+           drawer.draw_line(circle.center + first, circle.center + second);
+       }
    }
 }}
