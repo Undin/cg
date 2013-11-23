@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <array>
+#include <iostream>
 
 #include <boost/optional.hpp>
 
@@ -10,6 +11,8 @@
 #include <cg/primitives/point.h>
 #include <cg/operations/orientation.h>
 #include <cg/triangulation/cell_structure.h>
+
+using namespace std;
 
 namespace cg
 {
@@ -50,12 +53,21 @@ namespace cg
             {
                 return CircleContent::OUT_CIRCLE;
             }
+            bool infFace = false;
             for (int i = 0; i < 3; i++)
             {
-                if (v[i]->inf && orientation(v[next(i)]->point, v[prev(i)]->point, d->point) == cg::CG_LEFT)
+                if (v[i]->inf)
                 {
-                     return CircleContent::IN_CIRCLE;
+                    infFace = true;
+                    if (orientation(v[next(i)]->point, v[prev(i)]->point, d->point) == cg::CG_LEFT)
+                    {
+                         return CircleContent::IN_CIRCLE;
+                    }
                 }
+            }
+            if (infFace)
+            {
+                return CircleContent::OUT_CIRCLE;
             }
 
             double result = determinant<double>(v, d);
@@ -135,6 +147,15 @@ namespace cg
         return *inCircleR()(v, d);
     }
 
+    bool badEdge(const Edge &e)
+    {
+        Vertex a = e->first_vertex;
+        Vertex b = e->second_vertex;
+        Vertex c = e->next->second_vertex;
+        Vertex d = e->twin->next->second_vertex;
+        return inCircle(a, b, c, d) == CircleContent::IN_CIRCLE;
+    }
+
     bool inFace(const Face &f, const Vertex &v)
     {
         bool result = true;
@@ -148,4 +169,3 @@ namespace cg
         return result;
     }
 }
-
