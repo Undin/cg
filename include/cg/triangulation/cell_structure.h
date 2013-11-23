@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include <boost/shared_ptr.hpp>
 
 #include <cg/primitives/point.h>
@@ -17,21 +19,17 @@ typedef boost::shared_ptr<FaceHandle> Face;
 
 struct VertexHandle
 {
-    bool inf;
+    friend struct Triangulation;
 
+    bool inf;
     point_2 point;
     Edge edge;
 
-    friend struct Triangulation;
-
-public:
     VertexHandle() : inf(true)
     {}
 
     VertexHandle(const point_2 &p) : inf(false), point(p)
     {}
-
-public:
 
     bool operator<(const VertexHandle &other)
     {
@@ -50,28 +48,23 @@ public:
 
 struct EdgeHandle
 {
+    friend struct Triangulation;
+
     Vertex first_vertex;
     Vertex second_vertex;
     Edge twin;
     Edge next;
     Face face;
 
-    friend struct Triangulation;
-
-public:
-
     EdgeHandle(Vertex first, Vertex second) : first_vertex(first), second_vertex(second)
     {}
-
 };
 
 struct FaceHandle
 {
-    Edge edge;
-
     friend struct Triangulation;
 
-public:
+    Edge edge;
 
     FaceHandle(Edge edge) : edge(edge)
     {}
