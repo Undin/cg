@@ -2,9 +2,11 @@
 
 #include <vector>
 #include <set>
+#include <utility>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/array.hpp>
+#include <boost/utility.hpp>
 
 #include <cg/primitives/point.h>
 #include <cg/operations/orientation.h>
@@ -16,14 +18,14 @@ namespace cg {
 struct Triangulation
 {
     std::vector<Face> faces;
-    std::vector<Face> infinityFaces;
-    std::set<Vertex> verteces;
+    std::vector<Edge> edges;
+    std::set<Vertex> vertices;
 
     Vertex inf;
 
     size_t size()
     {
-        return verteces.size();
+        return vertices.size();
     }
 
     void setTwins(Edge a, Edge b)
@@ -32,69 +34,88 @@ struct Triangulation
         b->twin = a;
     }
 
-    void init(const point_2 &a, const point_2 &b, const point_2 &c)
+    void init()
     {
-        assert(a != b && a != c && b != c && orientation(a, b, c) != cg::CG_COLLINEAR);
-        inf = Vertex(new VertexHandle());
-        Vertex v[3];
-        v[0] = Vertex(new VertexHandle(a));
-        v[1] = Vertex(new VertexHandle(b));
-        v[2] = Vertex(new VertexHandle(c));
-        Edge edges[3];
-        auto nextIndex = orientation(a, b, c) == cg::CG_LEFT ? next : prev;
-        for (int i = 0, j = 0; i < 3; i++, j = nextIndex(j))
-        {
-            edges[i] = Edge(new EdgeHandle(v[j], v[nextIndex(j)]));
-            v[j]->edge = edges[i];
-        }
-        for (int i = 0; i < 3; i++)
-        {
-            edges[i]->next = edges[next(i)];
-        }
-        Edge reverseEdges[3];
-        for (int i = 0; i < 3; i++)
-        {
-            reverseEdges[i] = Edge(new EdgeHandle(edges[i]->second_vertex, edges[i]->first_vertex));
-            setTwins(edges[i], reverseEdges[i]);
-        }
+        Vertex v1 = *vertices.begin();
+        Vertex v2 = *boost::next(vertices.begin());
+        Edge e1(new EdgeHandle(v1, v2));
+        Edge e2(new EdgeHandle(v2, v1));
+        v1->edge = e1;
+        v2->edge = e2;
+        setTwins(e1, e2);
+        Face f1(new FaceHandle(e1));
+        e1->face = f1;
+        Face f2(new FaceHandle(e2));
+        e2->face = f2;
 
-        Face face = Face(new FaceHandle(edges[0]));
+        e1->next = Edge(new EdgeHandle(v2, inf));
+        e1->next->face = f1;
+        e1->next->next = Edge(new EdgeHandle(inf, v1));
+        e1->next->next->face = f1;
+        e1->next->next->next = e1;
+
+        e2->next = Edge(new EdgeHandle(v1, inf));
+        e2->next->face = f2;
+        e2->next->next = Edge(new EdgeHandle(inf, v1));
+        e2->next->next->face = f2;
+        e2->next->next->next = e2;
+
+        setTwins(e1->next, e1->next->next);
+        setTwins(e1->next->next, e2->next);
+
+        faces.push_back(f1);
+        faces.push_back(f2);
         for (int i = 0; i < 3; i++)
         {
-            edges[i]->face = face;
+            edges.push_back(e1);
+            edges.push_back(e2);
+            e1 = e1->next;
+            e2 = e2->next;
         }
-        Face infFaces[3];
-        for (int i = 0; i < 3; i++)
-        {
-            infFaces[i] = Face(new FaceHandle(reverseEdges[i]));
-            reverseEdges[i]->next = Edge(new EdgeHandle(reverseEdges[i]->second_vertex, inf));
-            reverseEdges[i]->next->face = infFaces[i];
-            reverseEdges[i]->next->next = Edge(new EdgeHandle(inf, reverseEdges[i]->first_vertex));
-            reverseEdges[i]->next->next->face = infFaces[i];
-            reverseEdges[i]->next->next->next = reverseEdges[i];
-        }
-        for (int i = 0; i < 3; i++)
-        {
-            setTwins(reverseEdges[i]->next->next, reverseEdges[next(i)]->next);
-        }
-        for (int i = 0; i < 3; i++)
-        {
-            verteces.insert(v[i]);
-            infinityFaces.push_back(infFaces[i]);
-        }
-        faces.push_back(face);
     }
 
 public:
 
     bool valid()
     {
-        return verteces.size() > 3;
+        return vertices.size() > 1;
     }
 
-    Triangulation(const point_2 &a, const point_2 &b, const point_2 &c)
+    Triangulation() : inf(new VertexHandle())
+    {}
+
+    ~Triangulation()
     {
-        init(a, b, c);
+        for (auto it = vertices.begin(); it != vertices.end(); it++)
+        {
+            (*it)->edge.reset();
+        }
+        for (auto it = faces.begin(); it != faces.end(); it++)
+        {
+            (*it)->edge.reset();
+        }
+
+        for (auto it = edges.begin(); it != edges.end(); it++)
+        {
+            (*it)->first_vertex.reset();
+            (*it)->second_vertex.reset();
+            (*it)->twin.reset();
+            (*it)->next.reset();
+            (*it)->face.reset();
+        }
+    }
+
+    VertexHandle addPoint(const point_2 &p)
+    {
+        auto res = vertices.insert(Vertex(new VertexHandle(p)));
+        if (res.second)
+        {
+            if (vertices.size() == 2)
+            {
+                init();
+            }
+        }
+        return *(*res.first);
     }
 };
 }
