@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cmath>
+#include <array>
 
 #include <boost/optional.hpp>
-#include <boost/array.hpp>
 
 #include <gmpxx.h>
 
@@ -27,7 +27,7 @@ namespace cg
     }
 
     template<class Scalar>
-    Scalar determinant(const boost::array<Vertex, 3> &v, const Vertex &d)
+    Scalar determinant(const std::array<Vertex, 3> &v, const Vertex &d)
     {
         Scalar result = 0;
         for (int i = 0; i < 3; i++)
@@ -44,7 +44,7 @@ namespace cg
 
     struct inCircleD
     {
-        boost::optional<CircleContent> operator()(const boost::array<Vertex, 3> &v, const Vertex &d) const
+        boost::optional<CircleContent> operator()(const std::array<Vertex, 3> &v, const Vertex &d) const
         {
             if (d->inf)
             {
@@ -88,7 +88,7 @@ namespace cg
 
         boost::numeric::interval<double>::traits_type::rounding _;
 
-        boost::optional<CircleContent> operator()(const boost::array<Vertex, 3> &v, const Vertex &d)
+        boost::optional<CircleContent> operator()(const std::array<Vertex, 3> &v, const Vertex &d)
         {
             interval result = determinant<interval>(v, d);
             if (result.lower() > 0)
@@ -105,7 +105,7 @@ namespace cg
 
     struct inCircleR
     {
-        boost::optional<CircleContent> operator()(const boost::array<Vertex, 3> &v, const Vertex &d)
+        boost::optional<CircleContent> operator()(const std::array<Vertex, 3> &v, const Vertex &d)
         {
             mpq_class result = determinant<mpq_class>(v, d);
             if (result > 0)
@@ -122,7 +122,7 @@ namespace cg
 
     CircleContent inCircle(const Vertex &a, const Vertex &b, const Vertex &c, const Vertex &d)
     {
-        boost::array<Vertex, 3> v;
+        std::array<Vertex, 3> v;
         v[0] = a;
         v[1] = b;
         v[2] = c;
@@ -141,7 +141,7 @@ namespace cg
         Edge e = f->edge;
         for (int i = 0; i < 3 && result; i++, e = e->next)
         {
-            result &= (e->first_vertex->inf ||
+            result &= (e->first_vertex->inf  ||
                        e->second_vertex->inf ||
                        orientation(e->first_vertex->point, e->second_vertex->point, v->point) != cg::CG_RIGHT);
         }

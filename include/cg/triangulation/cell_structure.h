@@ -1,8 +1,6 @@
 #pragma once
 
-#include <iostream>
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <cg/primitives/point.h>
 
@@ -13,9 +11,9 @@ struct EdgeHandle;
 struct VertexHandle;
 struct Triangulation;
 
-typedef boost::shared_ptr<VertexHandle> Vertex;
-typedef boost::shared_ptr<EdgeHandle> Edge;
-typedef boost::shared_ptr<FaceHandle> Face;
+typedef std::shared_ptr<VertexHandle> Vertex;
+typedef std::shared_ptr<EdgeHandle> Edge;
+typedef std::shared_ptr<FaceHandle> Face;
 
 struct VertexHandle
 {
