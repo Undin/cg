@@ -137,17 +137,13 @@ namespace cg
 
     bool inFace(const Face &f, const Vertex &v)
     {
-        if (v->inf)
-        {
-            return false;
-        }
         bool result = true;
         Edge e = f->edge;
         for (int i = 0; i < 3 && result; i++, e = e->next)
         {
             result &= (e->first_vertex->inf ||
                        e->second_vertex->inf ||
-                       orientation(e->first_vertex->point, e->second_vertex->point, v->point) == cg::CG_LEFT);
+                       orientation(e->first_vertex->point, e->second_vertex->point, v->point) != cg::CG_RIGHT);
         }
         return result;
     }
