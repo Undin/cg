@@ -192,20 +192,16 @@ public:
     {
         for (auto it = vertices.begin(); it != vertices.end(); it++)
         {
-            (*it)->edge.reset();
+            (*it)->reset();
         }
         for (auto it = faces.begin(); it != faces.end(); it++)
         {
-            (*it)->edge.reset();
+            (*it)->reset();
         }
 
         for (auto it = edges.begin(); it != edges.end(); it++)
         {
-            (*it)->first_vertex.reset();
-            (*it)->second_vertex.reset();
-            (*it)->twin.reset();
-            (*it)->next.reset();
-            (*it)->face.reset();
+            (*it)->reset();
         }
     }
 

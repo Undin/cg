@@ -35,12 +35,12 @@ namespace cg
         Scalar result = 0;
         for (int i = 0; i < 3; i++)
         {
-            result += ((Scalar) v[i]->point.x - d->point.x) *
-                      ((Scalar) v[next(i)]->point.y - d->point.y) *
-                      (pointSqr<Scalar>(v[prev(i)]->point) - pointSqr<Scalar>(d->point)) -
-                      ((Scalar) v[i]->point.x - d->point.x) *
-                      ((Scalar) v[prev(i)]->point.y - d->point.y) *
-                      (pointSqr<Scalar>(v[next(i)]->point) - pointSqr<Scalar>(d->point));
+            result += ((Scalar) v[i]->getPoint().x - d->getPoint().x) *
+                      ((Scalar) v[next(i)]->getPoint().y - d->getPoint().y) *
+                      (pointSqr<Scalar>(v[prev(i)]->getPoint()) - pointSqr<Scalar>(d->getPoint())) -
+                      ((Scalar) v[i]->getPoint().x - d->getPoint().x) *
+                      ((Scalar) v[prev(i)]->getPoint().y - d->getPoint().y) *
+                      (pointSqr<Scalar>(v[next(i)]->getPoint()) - pointSqr<Scalar>(d->getPoint()));
         }
         return result;
     }
@@ -49,17 +49,17 @@ namespace cg
     {
         boost::optional<CircleContent> operator()(const std::array<Vertex, 3> &v, const Vertex &d) const
         {
-            if (d->inf)
+            if (d->isInfinity())
             {
                 return CircleContent::OUT_CIRCLE;
             }
             bool infFace = false;
             for (int i = 0; i < 3; i++)
             {
-                if (v[i]->inf)
+                if (v[i]->isInfinity())
                 {
                     infFace = true;
-                    if (orientation(v[next(i)]->point, v[prev(i)]->point, d->point) == cg::CG_LEFT)
+                    if (orientation(v[next(i)]->getPoint(), v[prev(i)]->getPoint(), d->getPoint()) == cg::CG_LEFT)
                     {
                          return CircleContent::IN_CIRCLE;
                     }
@@ -74,12 +74,12 @@ namespace cg
             double resultAbs = 0;
             for (int i = 0; i < 3; i++)
             {
-                resultAbs += fabs((v[i]->point.x - d->point.x) *
-                                  (v[next(i)]->point.y - d->point.y) *
-                                  (pointSqr<double>(v[prev(i)]->point) - pointSqr<double>(d->point))) +
-                             fabs((v[i]->point.x - d->point.x) *
-                                  (v[prev(i)]->point.y - d->point.y) *
-                                  (pointSqr<double>(v[next(i)]->point) - pointSqr<double>(d->point)));
+                resultAbs += fabs((v[i]->getPoint().x - d->getPoint().x) *
+                                  (v[next(i)]->getPoint().y - d->getPoint().y) *
+                                  (pointSqr<double>(v[prev(i)]->getPoint()) - pointSqr<double>(d->getPoint()))) +
+                             fabs((v[i]->getPoint().x - d->getPoint().x) *
+                                  (v[prev(i)]->getPoint().y - d->getPoint().y) *
+                                  (pointSqr<double>(v[next(i)]->getPoint()) - pointSqr<double>(d->getPoint())));
             }
             double eps = resultAbs * 16 * std::numeric_limits<double>::epsilon();
             if (result > eps)
@@ -149,23 +149,28 @@ namespace cg
 
     bool badEdge(const Edge &e)
     {
-        Vertex a = e->first_vertex;
-        Vertex b = e->second_vertex;
-        Vertex c = e->next->second_vertex;
-        Vertex d = e->twin->next->second_vertex;
+        Vertex a = e->getFirstVertex();
+        Vertex b = e->getSecondVertex();
+        Vertex c = e->getNextEdge()->getSecondVertex();
+        Vertex d = e->getTwin()->getNextEdge()->getSecondVertex();
         return inCircle(a, b, c, d) == CircleContent::IN_CIRCLE;
     }
 
     bool inFace(const Face &f, const Vertex &v)
     {
         bool result = true;
-        Edge e = f->edge;
-        for (int i = 0; i < 3 && result; i++, e = e->next)
+        Edge e = f->getEdge();
+        for (int i = 0; i < 3 && result; i++, e = e->getNextEdge())
         {
-            result &= (e->first_vertex->inf  ||
-                       e->second_vertex->inf ||
-                       orientation(e->first_vertex->point, e->second_vertex->point, v->point) != cg::CG_RIGHT);
+            result &= (e->getFirstVertex()->isInfinity()  ||
+                       e->getSecondVertex()->isInfinity() ||
+                       orientation(e->getFirstVertex()->getPoint(), e->getSecondVertex()->getPoint(), v->getPoint()) != cg::CG_RIGHT);
         }
         return result;
+    }
+
+    bool inFace(const Face &f, const point_2 &p)
+    {
+        return inFace(f, Vertex(new VertexHandle(p)));
     }
 }

@@ -27,12 +27,12 @@ struct graham_viewer : cg::visualization::viewer_adapter
             {
                 if (!(*it)->isInfinity())
                 {
-                    cg::Edge edge = (*it)->edge;
+                    cg::Edge edge = (*it)->getEdge();
                     drawer.set_color(Qt::white);
                     for (int i = 0; i < 3; i++)
                     {
-                        drawer.draw_line(edge->first_vertex->point, edge->next->first_vertex->point);
-                        edge = edge->next;
+                        drawer.draw_line(edge->getFirstVertex()->getPoint(), edge->getNextEdge()->getFirstVertex()->getPoint());
+                        edge = edge->getNextEdge();
                     }
                 }
             }
@@ -49,12 +49,7 @@ struct graham_viewer : cg::visualization::viewer_adapter
     {
         pts.push_back(p);
         tr.insertPoint(p);
-//        tr.insertPoint(point_2f(-100, 0));
-//        tr.insertPoint(point_2f(0, 0));
-//        tr.insertPoint(point_2f(-50, 50));
-//        tr.insertPoint(point_2f(-30, 100));
         return true;
-//        return false;
     }
 
     bool on_move(const cg::point_2f &p)
@@ -65,12 +60,13 @@ struct graham_viewer : cg::visualization::viewer_adapter
             for (auto it = tr.faces.begin(); it != tr.faces.end(); it++)
             {
                 cg::Face f = *it;
-                if (!f->isInfinity() && cg::inFace(f, cg::Vertex(new cg::VertexHandle(p))))
+                if (!f->isInfinity() && cg::inFace(f, p))
                 {
                     needDrawCircle = true;
-                    points[0] = f->edge->first_vertex->point;
-                    points[1] = f->edge->second_vertex->point;
-                    points[2] = f->edge->next->second_vertex->point;
+                    cg::Edge e = f->getEdge();
+                    points[0] = e->getFirstVertex()->getPoint();
+                    points[1] = e->getSecondVertex()->getPoint();
+                    points[2] = e->getNextEdge()->getSecondVertex()->getPoint();
                     break;
                 }
             }
