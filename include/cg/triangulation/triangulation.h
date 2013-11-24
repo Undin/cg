@@ -20,6 +20,7 @@ using std::endl;
 
 struct Triangulation
 {
+private:
     std::vector<Face> faces;
     std::vector<Edge> edges;
     std::set<Vertex> vertices;
@@ -170,7 +171,6 @@ struct Triangulation
 
         for (int i = 0; i < 3; i++)
         {
-            cout << oldEdges[i];
             if (badEdge(oldEdges[i]))
             {
                 flip(oldEdges[i]);
@@ -231,6 +231,18 @@ public:
             }
         }
         return *(*res.first);
+    }
+
+    typedef std::vector<Face>::const_iterator FaceIterator;
+
+    FaceIterator faceBegin() const
+    {
+        return faces.cbegin();
+    }
+
+    FaceIterator faceEnd() const
+    {
+        return faces.cend();
     }
 };
 }

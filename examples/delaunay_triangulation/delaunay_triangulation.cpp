@@ -23,7 +23,7 @@ struct graham_viewer : cg::visualization::viewer_adapter
     {
         if (tr.valid())
         {
-            for (auto it = tr.faces.begin(); it != tr.faces.end(); it++)
+            for (auto it = tr.faceBegin(); it != tr.faceEnd(); it++)
             {
                 if (!(*it)->isInfinity())
                 {
@@ -57,7 +57,7 @@ struct graham_viewer : cg::visualization::viewer_adapter
         needDrawCircle = false;
         if (tr.valid())
         {
-            for (auto it = tr.faces.begin(); it != tr.faces.end(); it++)
+            for (auto it = tr.faceBegin(); it != tr.faceEnd(); it++)
             {
                 cg::Face f = *it;
                 if (!f->isInfinity() && cg::inFace(f, p))
