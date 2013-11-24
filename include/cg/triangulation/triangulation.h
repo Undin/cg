@@ -234,6 +234,7 @@ public:
     }
 
     typedef std::vector<Face>::const_iterator FaceIterator;
+    typedef std::set<Vertex>::const_iterator VertexIterator;
 
     FaceIterator faceBegin() const
     {
@@ -243,6 +244,16 @@ public:
     FaceIterator faceEnd() const
     {
         return faces.cend();
+    }
+
+    VertexIterator vertexBegin() const
+    {
+        return vertices.cbegin();
+    }
+
+    VertexIterator vertexEnd() const
+    {
+        return vertices.cend();
     }
 };
 }
