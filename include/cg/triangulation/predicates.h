@@ -147,13 +147,16 @@ namespace cg
         return *inCircleR()(v, d);
     }
 
-    bool badEdge(const Edge &e)
+    bool badEdge(const Edge &e1)
     {
-        Vertex a = e->getFirstVertex();
-        Vertex b = e->getSecondVertex();
-        Vertex c = e->getNextEdge()->getSecondVertex();
-        Vertex d = e->getTwin()->getNextEdge()->getSecondVertex();
-        return inCircle(a, b, c, d) == CircleContent::IN_CIRCLE;
+        Vertex a1 = e1->getFirstVertex();
+        Vertex b1 = e1->getSecondVertex();
+        Vertex c1 = e1->getNextEdge()->getSecondVertex();
+        Edge e2 = e1->getTwin();
+        Vertex a2 = e2->getFirstVertex();
+        Vertex b2 = e2->getSecondVertex();
+        Vertex c2 = e2->getNextEdge()->getSecondVertex();
+        return inCircle(a1, b1, c1, c2) == CircleContent::IN_CIRCLE || inCircle(a2, b2, c2, c1) == CircleContent::IN_CIRCLE;
     }
 
     bool inFace(const Face &f, const Vertex &v)

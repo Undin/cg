@@ -120,6 +120,15 @@ private:
         secondFace[0]->first_vertex = secondFace[0]->next->next->second_vertex;
         secondFace[0]->second_vertex = secondFace[0]->next->first_vertex;
 
+        if (badEdge(firstFace[1]))
+        {
+            flip(firstFace[1]);
+        }
+        if (badEdge(firstFace[2]))
+        {
+            flip(firstFace[2]);
+        }
+
         if (badEdge(secondFace[1]))
         {
             flip(secondFace[1]);
